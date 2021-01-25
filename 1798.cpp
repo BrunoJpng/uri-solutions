@@ -1,32 +1,46 @@
 #include <iostream>
-#include <string.h>
-#define MAX 2500
 
 using namespace std;
 
-int n;
-int comp[MAX], val[MAX];
-int mat[MAX][MAX];
+struct Cano {
+  int comp;
+  int val;
+};
 
-int CutRod(int u, int p){
-    if(u == n || p == 0) return 0;
-    if(p < 0) return -9999;
+int CortandoCanos(Cano *A, int n, int t) {
+  int aux[t+1];
+  int res = 0;
 
-    if(mat[u][p] == -1)
-        mat[u][p] = max(CutRod(u+1,p), val[u] + CutRod(u,p-comp[u]));
-    
-    return mat[u][p];
+  for(int i=0; i<=t; i++)
+    aux[i] = 0;
+  
+  for(int i=0; i<n; i++) {
+    if (A[i].comp < t)
+      aux[A[i].comp] = max(aux[A[i].comp], A[i].val);
+
+    for(int j=0; j<=t; j++) {
+      if (aux[j] > 0 && j+A[i].comp <= t) {
+        aux[j+A[i].comp] = max(aux[j+A[i].comp], aux[j] + A[i].val);
+        res = max(res, aux[j+A[i].comp]);
+      }
+    }
+  }
+
+  return res;
 }
 
 int main(){
-    int t;
+  int n, t;
+  
+  while(cin >> n >> t){
+    Cano canos[n];
     
-    while(cin >> n >> t){
-        for(int i=0; i<n; i++) cin >> comp[i] >> val[i];
-        memset(mat,-1,sizeof(mat));
-        
-        cout << CutRod(0,t) << endl;
-    }
-    
-    return 0;
+    for(int i=0; i<n; i++) 
+      cin >> canos[i].comp >> canos[i].val;
+      
+    cout << CortandoCanos(canos,n,t) << endl;
+  }
+
+  
+  return 0;
 }
